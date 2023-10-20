@@ -124,18 +124,20 @@ def main(unittest=False):
     allowed_networks = []
     disallowed_networks = []
 
-    # Validate command line arguments
-    if len(sys.argv) == 3:
-        allowed_input = sys.argv[1]
-        disallowed_input = sys.argv[2]
-    elif len(sys.argv) == 2:
-        disallowed_input = sys.argv[1]
-    else:
-        print("Wrong number of arguments provided, falling back to interactive mode.")
-        # Reset inputs to fall back to interactive mode
-        allowed_input = ""
-        disallowed_input = ""
-
+    # Check if any command line arguments were provided
+    if len(sys.argv) > 1:
+        if len(sys.argv) == 3:
+            allowed_input = sys.argv[1]
+            disallowed_input = sys.argv[2]
+        elif len(sys.argv) == 2:
+            disallowed_input = sys.argv[1]
+        else:
+            # If there are more than 3 arguments, that's unexpected.
+            print("Unexpected number of arguments provided, falling back to interactive mode.")
+            # Reset inputs to fall back to interactive mode
+            allowed_input = ""
+            disallowed_input = ""
+e
     # Validate and parse command line arguments or get user input if arguments are invalid or not provided.
     if allowed_input:
         allowed_networks, invalid_allowed = parse_ip_networks(allowed_input)
