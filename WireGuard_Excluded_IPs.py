@@ -117,41 +117,49 @@ def sort_networks(networks):
     # Combine the lists with all IPv4 addresses first, then IPv6
     return ipv4_sorted + ipv6_sorted
 
-
 def main(unittest=False):
     allowed_input = ""
     disallowed_input = ""
     allowed_networks = []
     disallowed_networks = []
 
-    # Validate command line arguments
-    if len(sys.argv) == 3:
-        allowed_input = sys.argv[1]
-        disallowed_input = sys.argv[2]
-    elif len(sys.argv) == 2:
-        disallowed_input = sys.argv[1]
-    else:
-        print("Wrong number of arguments provided, falling back to interactive mode.")
-        # Reset inputs to fall back to interactive mode
-        allowed_input = ""
-        disallowed_input = ""
+    # Check if any command line arguments were provided
+    if len(sys.argv) > 1:
+        if len(sys.argv) == 3:
+            allowed_input = sys.argv[1]
+            disallowed_input = sys.argv[2]
+        elif len(sys.argv) == 2:
+            disallowed_input = sys.argv[1]
+        else:
+            # If there are more than 3 arguments, that's unexpected.
+            print("Unexpected number of arguments provided, falling back to interactive mode.")
+            # Reset inputs to fall back to interactive mode
+            allowed_input = ""
+            disallowed_input = ""
 
     # Validate and parse command line arguments or get user input if arguments are invalid or not provided.
     if allowed_input:
         allowed_networks, invalid_allowed = parse_ip_networks(allowed_input)
         if invalid_allowed:
             print("Invalid Allowed IPs: " + ", ".join(invalid_allowed))
-            allowed_networks = (
-                []
-            )  # Reset to empty to trigger interactive mode for allowed IPs
+            allowed_networks = []  # Reset to empty to trigger interactive mode for allowed IPs
 
     if disallowed_input:  # This ensures it won't run if there's no disallowed_input
         disallowed_networks, invalid_disallowed = parse_ip_networks(disallowed_input)
         if invalid_disallowed:
             print("Invalid Disallowed IPs: " + ", ".join(invalid_disallowed))
-            disallowed_networks = (
-                []
-            )  # Reset to empty to trigger interactive mode for disallowed IPs
+            disallowed_networks = []  # Reset to empty to trigger interactive mode for disallowed IPs
+
+    # If inputs were invalid or not provided, switch to interactive mode.
+    if not allowed_networks and not len(sys.argv) == 2:
+        allowed_networks = get_input_and_parse(
+            "Enter the Allowed IPs, comma separated (e.g., 0.0.0.0/0):\n"
+        )
+
+    if not disallowed_networks:
+        disallowed_networks = get_input_and_parse(
+            "Enter the Disallowed IPs, comma separated (e.g., 10.0.0.0/8,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16):\n"
+        )
 
     # If inputs were invalid or not provided, switch to interactive mode.
     if not allowed_networks and not len(sys.argv) == 2:
